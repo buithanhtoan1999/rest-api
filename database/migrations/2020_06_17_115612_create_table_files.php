@@ -18,8 +18,8 @@ class CreateTableFiles extends Migration
             $table->string('name');
             $table->string('path');
             $table->integer('size');
-            $table->integer('task_id')->unsigned();
-            $table->foreign('task_id')->references('id')->on('tasks');
+            $table->integer('product_id')->unsigned();
+            $table->foreign('product_id')->references('id')->on('products');
             $table->timestamps();
         });
     }

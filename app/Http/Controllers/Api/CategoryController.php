@@ -6,16 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DepartmentStoreRequest;
-use App\Http\Requests\DepartmentUpdateRequest;
-use App\Models\Department;
+use App\Http\Requests\CategoryStoreRequest;
+use App\Models\Category;
 
 
-class DepartmentController extends Controller
+class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $pagination = Department::paginate($request->per_page ?? 20);
+        $pagination = Category::paginate($request->per_page ?? 20);
         return response()->json([
             'success' => true,
             'data' => $pagination->items(),
@@ -29,7 +28,7 @@ class DepartmentController extends Controller
 
     public function show(Request $request, $id)
     {
-        $model = Department::where('id', $id)->first();
+        $model = Category::where('id', $id)->first();
         if (!$model) {
             return response()->json(['error' => 'Not found'], 404);
         }
@@ -39,10 +38,10 @@ class DepartmentController extends Controller
         ]);
     }
 
-    public function store(DepartmentStoreRequest $request)
+    public function store(CategoryStoreRequest $request)
     {
         try {
-            $model = new Department();
+            $model = new Category();
             $data = $request->only($model->getFillable());
             $model->fill($data);
             $model->save();
@@ -53,11 +52,11 @@ class DepartmentController extends Controller
         }
     }
 
-    public function update(DepartmentUpdateRequest $request, $id)
+    public function update(CategoryStoreRequest $request, $id)
     {
         try {
             $data = $request->toArray();
-            $model = Department::where('id', $id)->first();
+            $model = Category::where('id', $id)->first();
             if (!$model) {
                 return response()->json(['error' => 'Not found'], 404);
             }
@@ -79,7 +78,7 @@ class DepartmentController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            Department::where('id', $id)->delete();
+            Category::where('id', $id)->delete();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error($e);

@@ -8,19 +8,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DepartmentStoreRequest;
-use App\Http\Requests\DepartmentUpdateRequest;
-use App\Models\Task;
+use App\Models\Product;
 use App\Models\UserTask;
-use App\Models\Department;
-use App\Models\User;
 use App\Models\File;
 
-class TaskController extends Controller
+class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $pagination = Task::with('creator','status','users')->paginate($request->per_page ?? 100);
+        $pagination = Product::with('category')->paginate($request->per_page ?? 100);
         return response()->json([
             'success' => true,
             'data' => $pagination->items(),
@@ -32,57 +28,9 @@ class TaskController extends Controller
         ]);
     }
 
-    public function getTasks(Request $request)
-    {
-    $departments = Department::all();
-    $data = [];
-    $index = 0;
-    foreach ($departments as $department) {
-        $count = [];
-        $count['id'] = $department['id'];
-        $count['name'] = $department['name'];
-       $count['task'] = Task::where('department_id', $department['id'])->count();
-       $count['user'] = User::where('department_id', $department['id'])->count();
-        $data[$index] = $count;
-        $index++;
-    }
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ]);
-    }
-    public function getMyTasks(Request $request,$id)
-    {
-        $model = Task::with('users','status', 'creator')->where('department_id', $id)->paginate($request->per_page ?? 100);;
-        return response()->json([
-            'success' => true,
-            'data' => $model->items(),
-            'paging' => [
-                'current_page' => $model->currentPage(),
-                'per_page' => $model->perPage(),
-                'total' => $model->total(),
-            ]
-        ]);
-    }
-
-    public function taskUser(Request $request,$id)
-    {
-        $ids = UserTask::whereIn('user_id', $id)->pluck('task_id');
-        $model = Task::with('users','status', 'creator')->whereIn('id', $ids)->paginate($request->per_page ?? 100);
-        return response()->json([
-            'success' => true,
-            'data' => $model->items(),
-            'paging' => [
-                'current_page' => $model->currentPage(),
-                'per_page' => $model->perPage(),
-                'total' => $model->total(),
-            ]
-        ]);
-    }
-
     public function show(Request $request, $id)
     {
-        $model = Task::with('users','status')->where('id', $id)->first();
+        $model = Product::with('category')->where('id', $id)->first();
         if (!$model) {
             return response()->json(['error' => 'Not found'], 404);
         }
@@ -92,17 +40,13 @@ class TaskController extends Controller
         ]);
     }
 
-    public function store(DepartmentStoreRequest $request)
+    public function store(Request $request)
     {
         try {
-            $model = new Task();
+            $model = new Product();
             $data = $request->only($model->getFillable());
             $model->fill($data);
             $model->save();
-            if ($request->get('users') !== null) {
-                $users = json_decode($request->get('users'),true);
-                $model->users()->sync($users); 
-            }
             if ($request->has('newFiles')) {
                 $this->upload($request->file('newFiles'), $model);
             }
@@ -128,11 +72,11 @@ class TaskController extends Controller
         }
     }
 
-    public function update(DepartmentUpdateRequest $request, $id)
+    public function update(Request $request, $id)
     {
         try {
             $data = $request->toArray();
-            $model = Task::where('id', $id)->first();
+            $model = Product::where('id', $id)->first();
             if (!$model) {
                 return response()->json(['error' => 'Not found'], 404);
             }
@@ -187,7 +131,7 @@ class TaskController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            User::where('id', $id)->delete();
+            Product::where('id', $id)->delete();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -198,7 +142,7 @@ class TaskController extends Controller
     public function search(Request $request)
     {
         $data = $request->toArray();
-        $query = Task::query()->with('creator','status','users');
+        $query = Product::query()->with('creator','status','users');
         if (array_key_exists('name', $data)) {
             $query = $query->where('name','LIKE','%'.$data['name'].'%');
         }

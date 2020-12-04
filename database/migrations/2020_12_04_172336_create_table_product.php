@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTableTaskStatus extends Migration
+class CreateTableProduct extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateTableTaskStatus extends Migration
      */
     public function up()
     {
-        Schema::create('status', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('products', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->string('name');
+            $table->string('price');
+            $table->string('description');
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CreateTableTaskStatus extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('status');
+        Schema::dropIfExists('products');
     }
 }

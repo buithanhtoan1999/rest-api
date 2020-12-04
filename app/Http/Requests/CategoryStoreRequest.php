@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DepartmentUpdateRequest extends BaseRequest
+class CategoryStoreRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,15 +28,4 @@ class DepartmentUpdateRequest extends BaseRequest
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array
-     */
-    public function attributes()
-    {
-        return [
-            'name' => '部門',
-        ];
-    }
 }

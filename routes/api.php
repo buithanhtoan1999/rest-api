@@ -23,16 +23,10 @@ Route::namespace('Api')->group(function() {
         Route::post('me', 'AuthController@me');
         Route::post('me/update-profile', 'UserController@updateProfile');
         Route::post('users/search', 'UserController@search');
-        Route::post('tasks/search', 'TaskController@search');
-        Route::get('get-tasks', 'TaskController@getTasks');
-        Route::get('get-my-tasks/{id}', 'TaskController@getMyTasks');
-        Route::get('my-user/{id}', 'UserController@getMyUser');
-        Route::get('taskUser/{id}', 'TaskUser@taskUser');
         Route::apiResources([
-            'departments' => 'DepartmentController',
+            'categories' => 'CategoryController',
             'users' => 'UserController',
-            'status' => 'StatusController',
-            'tasks' => 'TaskController',
+            'products' => 'ProductController',
         ]);
     });
 });
