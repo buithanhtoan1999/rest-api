@@ -16,7 +16,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $pagination = Product::with('category')->paginate($request->per_page ?? 23);
+        $pagination = Product::with('category','files')->paginate($request->per_page ?? 23);
         return response()->json([
             'success' => true,
             'data' => $pagination->items(),
@@ -47,8 +47,8 @@ class ProductController extends Controller
             $data = $request->only($model->getFillable());
             $model->fill($data);
             $model->save();
-            if ($request->has('newFiles')) {
-                $this->upload($request->file('newFiles'), $model);
+            if ($request->has('file')) {
+                $this->upload($request->file('file'), $model);
             }
             return response()->json(['success' => true, 'data' => $model]);
         } catch (\Exception $e) {
@@ -57,19 +57,17 @@ class ProductController extends Controller
         }
     }
 
-    public function upload($files, $document)
+    public function upload($file, $document)
     {
-        foreach ($files as $file) {
-            $path = $file->store('files', 'public');
-            $originName = $file->getClientOriginalName();
-            $size = $file->getClientsize();
-            $attachment = File::create([
-                'name' => $originName,
-                'path' => $path,
-                'size' => $size
-            ]);
-            $document->files()->save($attachment);
-        }
+        $path = $file->store('files', 'public');
+        $originName = $file->getClientOriginalName();
+        $size = $file->getClientsize();
+        $attachment = new File();
+        $attachment['name'] = $originName;
+        $attachment['path'] = $path;
+        $attachment['size'] = $size;
+        $attachment['product_id'] = $document['id'];
+        $res = $attachment->save();
     }
 
     public function update(Request $request, $id)
@@ -82,13 +80,6 @@ class ProductController extends Controller
             }
             $model->fill($data);
             $model->update();
-            if ($request->has('oldFile')){
-                $oldFile = json_decode($request->oldFile, true);
-                $this->syncFiles($oldFile, $item);
-            }
-            if ($request->has('newFiles')) {
-                $this->upload($request->file('newFiles'), $item);
-            }
             return response()->json([
                 'success' => true,
                 'data' => $model

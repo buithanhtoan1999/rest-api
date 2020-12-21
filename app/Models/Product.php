@@ -14,9 +14,18 @@ class Product extends Model
         'name',
         'description',
         'price',
-        'category_id'
+        'category_id',
+        'status',
+        'discount',
+        'quantity'
     ];
+
     public function category() {
         return $this->belongsTo(Category::class,'category_id', 'id');
+    }
+
+    public function files()
+    {
+        return $this->hasOne(File::class, 'product_id', 'id');
     }
 }
