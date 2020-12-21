@@ -13,17 +13,12 @@ class User extends Authenticatable
 
     protected $table ='users';
 
-    const IS_STAFF = 0;
-    const IS_MANAGER = 1;
-    const IS_DIRECTOR = 2;
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'department_id',
         'name',
         'email',
         'password',

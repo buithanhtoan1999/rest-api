@@ -24,7 +24,7 @@ class UserUpdateRequest extends BaseRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:30'],
             'email' => ['email', 'max:64', 'unique:users,email,'.$this->id],
             'password' => 'min:6|max:20',
         ];
@@ -35,13 +35,5 @@ class UserUpdateRequest extends BaseRequest
      *
      * @return array
      */
-    public function attributes()
-    {
-        return [
-            'name' => '名前',
-            'email' => 'メールアドレス',
-            'password' => 'パスワード',
-            'position' => '役職'
-        ];
-    }
+
 }

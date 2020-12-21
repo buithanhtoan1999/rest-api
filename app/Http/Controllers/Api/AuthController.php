@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,25 @@ class AuthController extends Controller
             'success' => true,
             'access_token' => $token
         ]);
+    }
+
+    public function register(Request $request){
+        try {
+            $model = new User();
+            $data = $request->only($model->getFillable());
+            $data['password'] = Hash::make($data['password']);
+            $model->fill($data);
+            $model->save();
+           Auth::login($model);
+            $token = $request->user()->createToken('Personal Access Token')->accessToken;
+            return response()->json([
+                'success' => true,
+                'access_token' => $token
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['error' => 'Server error'], 500);
+        }
     }
 
     public function logout()

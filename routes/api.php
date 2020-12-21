@@ -15,8 +15,14 @@ use Illuminate\Support\Facades\Route;
 */
 Route::namespace('Api')->group(function() {
     Route::post('login', 'AuthController@login');
+    Route::post('register', 'AuthController@register');
     Route::post('forgot-password', 'AuthController@forgotPassword');
     Route::post('reset-password', 'AuthController@resetPassword');
+
+    Route::apiResources([
+        'categories' => 'CategoryController',
+        'products' => 'ProductController',
+    ]);
 
     Route::middleware('auth:api')->group(function() {
         Route::post('logout', 'AuthController@logout');
@@ -24,9 +30,9 @@ Route::namespace('Api')->group(function() {
         Route::post('me/update-profile', 'UserController@updateProfile');
         Route::post('users/search', 'UserController@search');
         Route::apiResources([
-            'categories' => 'CategoryController',
             'users' => 'UserController',
-            'products' => 'ProductController',
+            'orders' => 'OrderController',
+            'orderItems' => 'OrderItemController'
         ]);
     });
 });

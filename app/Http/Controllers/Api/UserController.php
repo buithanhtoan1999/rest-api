@@ -113,9 +113,6 @@ class UserController extends Controller
         if (array_key_exists('name', $data)) {
             $query = $query->where('name','LIKE','%'.$data['name'].'%');
         }
-        if (array_key_exists('department_id', $data)) {
-            $query = $query->where('department_id', intval($data['department_id']));
-        }
         $result = $query->paginate($request->per_page ?? 20);
 
         return response()->json([

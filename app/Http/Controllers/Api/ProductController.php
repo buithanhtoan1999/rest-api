@@ -16,7 +16,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $pagination = Product::with('category')->paginate($request->per_page ?? 100);
+        $pagination = Product::with('category')->paginate($request->per_page ?? 23);
         return response()->json([
             'success' => true,
             'data' => $pagination->items(),

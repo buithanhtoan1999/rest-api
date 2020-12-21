@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class OrderItem extends Model
 {
-    protected $table ='categories';
+    protected $table ='orderItems';
 
     public $timestamps = true;
 
     protected $fillable = [
-        'name',
-        'level'
+        'product_id',
+        'order_id',
+        'count'
     ];
 }
