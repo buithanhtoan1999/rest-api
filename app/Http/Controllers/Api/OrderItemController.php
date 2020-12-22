@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryStoreRequest;
 use App\Models\OrderItem;
-
+use App\Models\Product;
 
 class OrderItemController extends Controller
 {
@@ -43,8 +43,21 @@ class OrderItemController extends Controller
         try {
             $model = new OrderItem();
             $data = $request->only($model->getFillable());
-            $model->fill($data);
-            $model->save();
+            $product = Product::where('id', $data['product_id'])->first();
+            if (!$product) {
+                return response()->json(['error' => 'Not found'], 404);
+            }
+            if($product['quantity'] - $data['count'] >= 0) {
+                $product->fill([
+                    'quantity' => $product['quantity'] - $data['count'],
+                ]);
+                $product->update();
+    
+                $model->fill($data);
+                $model->save();
+            } else {
+                return response()->json(['error' => 'Sản phẩm đã hết hàng']);
+            }
             return response()->json(['success' => true, 'data' => $model]);
         } catch (\Exception $e) {
             Log::error($e);

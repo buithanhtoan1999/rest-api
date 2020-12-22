@@ -14,7 +14,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $pagination = Order::with('customer')->paginate($request->per_page ?? 20);
+        $pagination = Order::with('customer', 'items', 'items.product')->paginate($request->per_page ?? 20);
         return response()->json([
             'success' => true,
             'data' => $pagination->items(),
