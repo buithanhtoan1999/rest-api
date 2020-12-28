@@ -150,6 +150,6 @@ class OrderItemSeeder extends Seeder
                  'count'=>1,
              ],
          ];
-        DB::table('files')->insert($data);
+        DB::table('orderItems')->insert($data);
     }
 }
