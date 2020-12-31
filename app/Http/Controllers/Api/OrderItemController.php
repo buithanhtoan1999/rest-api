@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\Controller;
@@ -52,7 +54,7 @@ class OrderItemController extends Controller
                     'quantity' => $product['quantity'] - $data['count'],
                 ]);
                 $product->update();
-    
+
                 $model->fill($data);
                 $model->save();
             } else {
@@ -63,6 +65,57 @@ class OrderItemController extends Controller
             Log::error($e);
             return response()->json(['error' => 'Server error'], 500);
         }
+    }
+
+    public function report(Request $request) {
+
+
+        $topSell = OrderItem::query()
+            ->selectRaw('SUM(count) as total, products.name')->join('products', 'orderItems.product_id', '=','products.id')
+            ->groupBy('product_id')->orderBy('total', 'desc')->limit(3)
+            ->get()->toArray();
+
+        $data = $request->toArray();
+        $product_id = $data['product_id'];
+
+        $last6Months = [];
+        for($i = 6; $i >= 0; $i--) {
+            $last6Months[] = [
+                'month' => Carbon::now()->subDays($i)->day,
+                'value' => 0
+            ];
+        }
+
+        $commission = OrderItem::query()
+            ->where('product_id', $product_id)
+            ->where("created_at",">", Carbon::now()->subDay(7))
+            ->selectRaw('DAY(created_at) as day, SUM(count) as total')
+            ->groupBy(DB::raw('DAY(created_at)'))
+            ->get()->toArray();
+
+        $recentCommission = $last6Months;
+
+        foreach($commission as $comm) {
+            foreach($recentCommission as $idx => $month) {
+                if ($comm['day'] === $month['month']) {
+                    $recentCommission[$idx] = [
+                        'month' => $month['month'],
+                        'value' => $comm['total']
+                    ];
+                }
+            }
+        }
+
+        $total = OrderItem::query()
+            ->selectRaw('DAY(created_at) as day, SUM(count) as total')
+            ->groupBy(DB::raw('DAY(created_at)'))
+            ->get()->toArray();
+
+
+        return response()->json([
+            'success' => true,
+            'data' => $recentCommission,
+        ]);
     }
 
     public function update(Request $request, $id)

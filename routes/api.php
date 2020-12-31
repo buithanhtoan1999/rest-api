@@ -29,6 +29,7 @@ Route::namespace('Api')->group(function() {
         Route::post('me', 'AuthController@me');
         Route::post('me/update-profile', 'UserController@updateProfile');
         Route::post('users/search', 'UserController@search');
+        Route::get('report', 'OrderItemController@report');
         Route::apiResources([
             'users' => 'UserController',
             'orders' => 'OrderController',
